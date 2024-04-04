@@ -1,26 +1,33 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <navbarComponentVue/>
+  
+  
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+import navbarComponentVue from './components/navbarComponent.vue'
+
+
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    navbarComponentVue
+    
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+@import url("https://fonts.googleapis.com/css2?family=Ojuju:wght@200..800&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Ojuju", sans-serif;
+  background-color: #003f5c;
 }
+
 </style>
