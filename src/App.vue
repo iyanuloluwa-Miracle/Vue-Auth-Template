@@ -1,19 +1,27 @@
 <template>
-  <navbarComponentVue/>
+  <main>
+    <navbarComponentVue/>
+    <loginComponent/>
+    
+   
+
+  </main>
+ 
   
   
 </template>
 
 <script>
-
 import navbarComponentVue from './components/navbarComponent.vue'
+import loginComponent from './components/loginComponent.vue'
 
 
 
 export default {
   name: 'App',
   components: {
-    navbarComponentVue
+    navbarComponentVue,
+    loginComponent
     
   }
 }
@@ -29,5 +37,6 @@ export default {
   font-family: "Ojuju", sans-serif;
   background-color: #003f5c;
 }
+
 
 </style>
