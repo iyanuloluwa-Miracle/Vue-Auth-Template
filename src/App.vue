@@ -1,7 +1,7 @@
 <template>
   <main>
     <navbarComponentVue/>
-    <loginComponent/>
+    <router-view/>
     
    
 
@@ -13,7 +13,6 @@
 
 <script>
 import navbarComponentVue from './components/navbarComponent.vue'
-import loginComponent from './components/loginComponent.vue'
 
 
 
@@ -21,7 +20,7 @@ export default {
   name: 'App',
   components: {
     navbarComponentVue,
-    loginComponent
+  
     
   }
 }
