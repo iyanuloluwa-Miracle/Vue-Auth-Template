@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const authController = require('../controllers/authController');
+const authController = require('../controller/authController');
 
 
 router.get('/', async (req, res,) => {

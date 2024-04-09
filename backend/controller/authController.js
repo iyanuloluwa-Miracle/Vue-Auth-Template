@@ -1,6 +1,9 @@
-const bcrypt = require('bcrypt');
+const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../model/User');
+
+// Load environment variables
+require('dotenv').config();
 
 exports.register = async (req, res) => {
   try {
@@ -17,8 +20,8 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash the password using Argon2
+    const hashedPassword = await argon2.hash(password);
 
     // Create new user
     const newUser = new User({
@@ -47,14 +50,14 @@ exports.signin = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Check if password is correct
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    // Verify password using Argon2
+    const passwordMatch = await argon2.verify(user.password, password);
     if (!passwordMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
     // Generate JWT token
-    const token = jwt.sign({ _id: user._id }, 'your-secret-key');
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
     // Save token to user
     user.tokens = user.tokens.concat({ token });
