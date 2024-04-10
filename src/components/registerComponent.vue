@@ -54,6 +54,7 @@
 <script>
 
 import axios from 'axios'
+
 export default {
   data() {
     return {
@@ -73,6 +74,8 @@ export default {
         password: this.password,
         password_confirm: this.password_confirm,
       };
+      console.log('Payload for data',data)
+
    
       axios.post('http://localhost:3000/api/register', data)
 

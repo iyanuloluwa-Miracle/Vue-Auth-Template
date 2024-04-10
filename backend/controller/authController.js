@@ -8,10 +8,10 @@ require('dotenv').config();
 
 exports.register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, confirmPassword } = req.body;
+    const { first_name, last_name, email, password,password_confirm } = req.body;
 
     // Check if passwords match
-    if (password !== confirmPassword) {
+    if (password !== password_confirm) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
@@ -26,11 +26,11 @@ exports.register = async (req, res) => {
 
     // Create new user
     const newUser = new User({
-      firstName,
-      lastName,
+      first_name,
+      last_name,
       email,
       password: hashedPassword,
-      confirmPassword // Make sure to store confirmPassword securely in production
+      password_confirm // Make sure to store confirmPassword securely in production
     });
 
     await newUser.save();
