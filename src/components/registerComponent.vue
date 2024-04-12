@@ -66,29 +66,21 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
-      const data = {
+    async handleSubmit() {
+
+       await axios.post('register',{
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
         password: this.password,
         password_confirm: this.password_confirm,
-      };
-      console.log('Payload for data',data)
+
+      })
+      
+      this.$router.push('/login')
 
    
-      axios.post('http://localhost:3000/api/register', data)
-
-      .then(
-        res =>{
-          console.log(res)
-        }
-      ).catch(
-        err =>{
-          console.log(err)
-        }
-
-      )
+     
 
     },
   },

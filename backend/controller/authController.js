@@ -70,3 +70,44 @@ exports.signin = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    // Extract the token from the request headers
+    const token = req.headers.authorization;
+
+    // Check if the token is provided
+    if (!token) {
+      return res.status(401).json({ message: "Authorization token is required" });
+    }
+
+    // Verify the token
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+
+      // Check if the user has the necessary role/permission to access the users list
+      // For example, you could check if the user role is "admin"
+      const user = await User.findById(decoded._id);
+      if (!user || user.role !== "admin") {
+        return res.status(403).json({ message: "Unauthorized access" });
+      }
+
+      // If the user is authenticated and authorized, retrieve all users from the database
+      const users = await User.find();
+
+      // If no users found, return an empty array
+      if (!users || users.length === 0) {
+        return res.status(404).json({ message: "No users found" });
+      }
+
+      // If users found, return them in the response
+      res.status(200).json({ users });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

@@ -9,8 +9,9 @@ router.get('/', async (req, res,) => {
 
 
 
-
 router.post('/register', authController.register);
 router.post('/signin', authController.signin);
+// Define the route for retrieving all users
+router.get('/user', authController.getAllUsers);
 
 module.exports = router;
