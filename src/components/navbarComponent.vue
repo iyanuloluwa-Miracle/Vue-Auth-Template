@@ -1,11 +1,11 @@
 <template>
   <Header>
     <nav>
-      <h3>Home</h3>
+      <router-link to="/">Home</router-link>
     </nav>
     <div class="header">
-      <h3>Login</h3>
-      <h3 class="signup">Signup</h3>
+      <router-link to="/login">Login</router-link>
+      <router-link to="/register">Signup</router-link>
     </div>
     
 
@@ -33,6 +33,12 @@ header{
 }
 .signup{
   margin-left: 30px;
+
+}
+a{
+  text-decoration: none;
+  font-size: larger;
+  color:white;
 
 }
 </style>

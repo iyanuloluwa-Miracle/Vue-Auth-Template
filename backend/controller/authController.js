@@ -1,7 +1,8 @@
 require('../model/database')
 const argon2 = require('argon2');
-const jwt = require('jsonwebtoken');
 const User = require('../model/User');
+const { generateAccessToken ,verifyToken } = require('../utils/authUtils');
+
 
 // Load environment variables
 require('dotenv').config();
@@ -45,69 +46,82 @@ exports.signin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if user exists
+    // Find the user by name
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(401).json({ error: 'Invalid email!' });
     }
 
-    // Verify password using Argon2
-    const passwordMatch = await argon2.verify(user.password, password);
-    if (!passwordMatch) {
-      return res.status(400).json({ message: "Invalid email or password" });
+    // Compare the password using Argon2
+    const isPasswordValid = await argon2.verify(user.password, password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid password, Provide the correct Password!' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    // Generate the access token and refresh token
+    const accessToken = generateAccessToken(user);
 
-    // Save token to user
-    user.tokens = user.tokens.concat({ token });
-    await user.save();
+    // Send both tokens in the response
+    res.status(200).json({ success: true, accessToken, message:"Login Successful" });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+};
+exports.getAllUsers = async (req, res) => {
+  try {
+    // Check if the authorization header is provided
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: "Unauthorized: Missing authorization header" });
+    }
 
-    res.status(200).json({ message: "User signed in successfully", token });
+    // Split the authorization header to extract the token
+    const tokenParts = authHeader.split(' ');
+    if (tokenParts.length !== 2 || tokenParts[0] !== 'Bearer') {
+      return res.status(401).json({ message: "Unauthorized: Invalid authorization header format" });
+    }
+    const token = tokenParts[1];
+
+    // Verify the access token
+    verifyToken(token); // Verify token without storing the decoded payload
+
+    // If verification is successful, continue to fetch all users
+    const users = await User.find({}, 'first_name last_name email'); // Projection to include only name and email
+    res.status(200).json(users);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(401).json({ message: "Unauthorized: Invalid token" });
   }
 };
 
 
-exports.getAllUsers = async (req, res) => {
+exports.getUserById = async (req, res) => {
   try {
-    // Extract the token from the request headers
-    const token = req.headers.authorization;
-
-    // Check if the token is provided
-    if (!token) {
-      return res.status(401).json({ message: "Authorization token is required" });
+    // Check if the authorization header is provided
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: "Unauthorized: Missing authorization header" });
     }
 
-    // Verify the token
-    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-      if (err) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
+    // Split the authorization header to extract the token
+    const tokenParts = authHeader.split(' ');
+    if (tokenParts.length !== 2 || tokenParts[0] !== 'Bearer') {
+      return res.status(401).json({ message: "Unauthorized: Invalid authorization header format" });
+    }
+    const token = tokenParts[1];
 
-      // Check if the user has the necessary role/permission to access the users list
-      // For example, you could check if the user role is "admin"
-      const user = await User.findById(decoded._id);
-      if (!user || user.role !== "admin") {
-        return res.status(403).json({ message: "Unauthorized access" });
-      }
+    // Verify the access token
+    verifyToken(token); // Verify token without storing the decoded payload
 
-      // If the user is authenticated and authorized, retrieve all users from the database
-      const users = await User.find();
-
-      // If no users found, return an empty array
-      if (!users || users.length === 0) {
-        return res.status(404).json({ message: "No users found" });
-      }
-
-      // If users found, return them in the response
-      res.status(200).json({ users });
-    });
+    // If verification is successful, continue to fetch the user
+    const userId = req.params.userId; // Assuming userId is passed as a route parameter
+    const user = await User.findById(userId, 'first_name last_name email'); // Only fetch the specified fields
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ name: `${user.first_name} ${user.last_name}`, email: user.email });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(401).json({ message: "Unauthorized: Invalid token" });
   }
 };

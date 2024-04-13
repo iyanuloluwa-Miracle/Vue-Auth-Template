@@ -13,5 +13,5 @@ router.post('/register', authController.register);
 router.post('/signin', authController.signin);
 // Define the route for retrieving all users
 router.get('/user', authController.getAllUsers);
-
+router.get('/user/:userId', authController.getUserById );
 module.exports = router;

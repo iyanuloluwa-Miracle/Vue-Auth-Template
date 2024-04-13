@@ -35,7 +35,8 @@ export default {
 
       })
       console.log(response)
-      localStorage.setItem('token', response.data.token) 
+      localStorage.setItem('accessToken', response.data.accessToken)
+       this.$router.push('/')
     }
   }
 };
